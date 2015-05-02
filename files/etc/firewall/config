@@ -1,0 +1,26 @@
+# Do I have to run?
+ENABLED="YES"
+
+# What networks do I have @ my interfaces
+LOCALNETS="85.158.200.68/255.255.255.224 127.0.0.1/255.0.0.0"
+
+# Who is my backup server?
+BACKUPSERVER="217.170.2.78"
+
+# What ports are allowed in for everyone?
+TCP_OPEN=""
+UDP_OPEN=""
+
+# What outgoing ports are accepted?
+TCP_OUT_OPEN="22"
+UDP_OUT_OPEN=""
+
+# Do I run a FTP server?
+HAS_FTP_SERVER="NO"
+
+# What special ranges do I want to block completely?
+#BLOCKNETS="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 224.0.0.0/4 240.0.0.0/5"
+BLOCKNETS="224.0.0.0/4 240.0.0.0/5"
+
+# To what hosts are outgoing webrequests allowed? This default is for all
+WWWOUT="0.0.0.0/0"
