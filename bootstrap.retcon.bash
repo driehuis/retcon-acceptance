@@ -46,4 +46,5 @@ bash -l -c 'cd $HOME/retcon-web; bundle install'
 bash -l -c 'cd $HOME/retcon-web; bundle exec rake db:migrate'
 bash -l -c 'cd $HOME/retcon-web; script/runner /vagrant/seed_acceptance.rb'
 nohup bash -l -c 'cd $HOME/retcon-web; passenger start -p 3001' >passenger.install.log 2>&1 &
+bash -l -c 'cd $HOME/retcon-manager; bundle install'
 nohup bash -l -c 'cd $HOME/retcon-manager; bin/retcon-manager' >retcon-manager-start.log 2>&1 &
