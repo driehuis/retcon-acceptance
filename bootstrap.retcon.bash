@@ -1,9 +1,13 @@
 set -e
+grep -c "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
 sudo rsync -rl /vagrant/files/./ /./
 sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
 wget http://plank.cyso.net/linux/apt.cyso.net.pub.key -q -O - | sudo apt-key add -
-sudo apt-get update -qq && sudo apt-get dist-upgrade
-sudo apt-get install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
+apt_get_auto() {
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
+}
+sudo apt-get update -qq && apt_get_auto dist-upgrade
+apt_get_auto install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
  zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
  nginx cyso-firewall
 [ -f $HOME/.gemrc ] || echo gem: --no-ri --no-rdoc >$HOME/.gemrc
@@ -18,13 +22,12 @@ if [ ! -d .rbenv ]; then
   git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
   git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
   git clone git://github.com/carsomyr/rbenv-bundler.git ~/.rbenv/plugins/bundler
+  if ! grep -q rbenv .profile; then
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
+    echo 'eval "$(rbenv init -)"' >> ~/.profile
+  fi
   . ~/.profile
   bash -l -c 'rbenv install `cat $HOME/retcon-web/.ruby-version`'
-fi
-
-if ! grep -q rbenv .profile; then
-  echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
-  echo 'eval "$(rbenv init -)"' >> ~/.profile
 fi
 
 bash -l -c 'cd $HOME/retcon-web; which bundle || gem install -v=1.7.6 bundler'
