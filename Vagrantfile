@@ -1,0 +1,21 @@
+require 'vagrant-openstack-provider'
+
+Vagrant.configure('2') do |config|
+
+  config.vm.box       = 'openstack'
+  config.ssh.username = 'stack'
+
+  config.vm.provider :openstack do |os|
+    os.openstack_auth_url = ENV['OS_AUTH_URL'] + '/tokens'
+    os.username           = ENV['OS_USERNAME']
+    os.password           = ENV['OS_PASSWORD']
+    os.tenant_name        = ENV['OS_TENANT_NAME']
+    os.flavor             = 'c1.small'
+    os.image              = 'Ubuntu 14.04.2 LTS - Trusty Tahr - 64-bit - Cyso Cloud Based Image'
+    os.floating_ip_pool   = 'external'
+    os.server_name        = 'retcon-acc'
+    os.security_groups    = ['default']
+  end
+
+  config.ssh.username     = 'ubuntu'
+end
