@@ -1,5 +1,5 @@
 set -e
-grep -c "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
+grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
 sudo rsync -rl /vagrant/files/./ /./
 sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
 wget http://plank.cyso.net/linux/apt.cyso.net.pub.key -q -O - | sudo apt-key add -
@@ -16,6 +16,9 @@ cd $HOME
 
 if [ ! -d retcon-web ]; then
   git clone https://github.com/driehuis/retcon-web
+fi
+if [ ! -d retcon-manager ]; then
+  git clone https://github.com/driehuis/retcon-manager
 fi
 
 if [ ! -d .rbenv ]; then
@@ -43,3 +46,4 @@ bash -l -c 'cd $HOME/retcon-web; bundle install'
 bash -l -c 'cd $HOME/retcon-web; bundle exec rake db:migrate'
 bash -l -c 'cd $HOME/retcon-web; script/runner /vagrant/seed_acceptance.rb'
 nohup bash -l -c 'cd $HOME/retcon-web; passenger start -p 3001' >passenger.install.log 2>&1 &
+nohup bash -l -c 'cd $HOME/retcon-manager; bin/retcon-manager' >retcon-manager-start.log 2>&1 &
