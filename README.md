@@ -1,4 +1,4 @@
-# Retcon acceptance environment for Retcon
+# Acceptance environment for Retcon
 
 This project contains a completely self-contained Openstack environment
 to evaluate the Retcon backup manager.
@@ -22,10 +22,12 @@ Status
 ------
 
 1. Master server
+
 Functionally complete. After provisioning, run
 <pre>
 bash /vagrant/bootstrap.retcon.bash
 </pre>
 
 2. Retcon backup server
+
 Barely started work.
