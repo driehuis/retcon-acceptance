@@ -1,0 +1,14 @@
+defaults: &defaults
+  user: backup1-acc
+  pass: Gimubed00
+  url: http://retcon-acc/
+  interval: 3
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

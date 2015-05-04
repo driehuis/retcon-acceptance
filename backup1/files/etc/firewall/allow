@@ -19,6 +19,6 @@
 
 # Lines starting with a # will be ignored.
 
-incoming!tcp!80,443!93.94.224.189,109.235.73.248,172.17.1.0/24
+incoming!tcp!80,443!93.94.224.189,109.235.73.248
 outgoing!tcp!9418!0.0.0.0/0
 

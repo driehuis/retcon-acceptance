@@ -13,7 +13,7 @@ Vagrant.configure('2') do |config|
     os.flavor             = 'c1.small'
     os.image              = 'Ubuntu 14.04.2 LTS - Trusty Tahr - 64-bit - Cyso Cloud Based Image'
     os.floating_ip_pool   = 'external'
-    os.server_name        = 'retcon-acc'
+    os.server_name        = 'backup1-acc'
     os.security_groups    = ['default']
   end
   

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+# Temporary script to update the retcon statistics, until this gets integrated into the core of retcon.
+
+. $HOME/.profile
+cd $HOME/retcon-web
+script/runner 'BackupJob.all.each { |bj| if bj.finished && bj.backup_job_stats==nil then; bjs = BackupJobStats.new(:backup_job => bj); bjs.parse_all; bjs.created_at = bj.created_at; bjs.save!; end }' RAILS_ENV=production
+echo backup job stats updated
