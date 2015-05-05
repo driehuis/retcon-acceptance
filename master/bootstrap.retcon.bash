@@ -1,7 +1,7 @@
 set -e
 grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
 sudo rsync -rl /vagrant/files/./ /./
-ip addr|grep -q eth0:1 || sudo ifup eth0:1
+#ip addr|grep -q eth0:1 || sudo ifup eth0:1
 sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
 wget http://plank.cyso.net/linux/apt.cyso.net.pub.key -q -O - | sudo apt-key add -
 apt_get_auto() {

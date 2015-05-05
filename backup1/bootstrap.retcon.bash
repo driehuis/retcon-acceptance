@@ -1,10 +1,10 @@
 set -e
-exec >/var/tmp/bootstrap.retcon.`date +%F`-`date +%T`.log
-exec 2>&1
+# exec >/var/tmp/bootstrap.retcon.`date +%F`-`date +%T`.log
+# exec 2>&1
 grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
 grep -q "retcon-acc" /etc/hosts || sudo sh -c "echo 172.17.1.116 retcon-acc >>/etc/hosts"
 sudo rsync -rl /vagrant/files/./ /./
-ip addr|grep -q eth0:1 || sudo ifup eth0:1
+#ip addr|grep -q eth0:1 || sudo ifup eth0:1
 sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
 if [ ! -f /etc/apt/sources.list.d/zfs-native-stable-trusty.list ]; then
   sudo add-apt-repository --yes ppa:zfs-native/stable
@@ -22,8 +22,11 @@ sudo zpool status || shutdown -r now
 if [ ! -f /var/tmp/zfs-tank-disk0.img ]; then
  sudo dd if=/dev/zero of=/var/tmp/zfs-tank-disk0.img bs=4M count=2000
 fi
+if [ "`sudo losetup -a`" = "" ]; then
+  sudo losetup /dev/loop0 /var/tmp/zfs-tank-disk0.img
+fi
 if sudo zpool list | grep -q 'no pools'; then
- sudo zpool import tank || sudo zpool create tank /var/tmp/zfs-tank-disk0.img
+ sudo zpool import tank || sudo zpool create tank /dev/loop0
 fi
 
 [ -h /bin/pfexec ] || sudo ln -s /usr/bin/sudo /bin/pfexec
