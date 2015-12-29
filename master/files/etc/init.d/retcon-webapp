@@ -1,0 +1,77 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          retcon-webapp
+# Required-Start:    nginx
+# Required-Stop:     
+# Should-Start:      
+# Should-Stop:       
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start the retcon-web webapp (alternate port for development validation)
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+NAME=retcon-webapp
+DESC="recton-web (development)"
+port=3001
+APPDIR=/home/ubuntu/retcon-web
+PIDFILE=$APPDIR/tmp/pids/passenger.$port.pid
+SCRIPTNAME=/etc/init.d/$NAME
+APPENV=development
+APPUSER=ubuntu
+
+DAEMON_OPTS=""
+
+set -e
+
+. /lib/lsb/init-functions
+
+case "$1" in
+    start)
+        log_daemon_msg "Starting $DESC" $NAME
+	if su -s /bin/bash - $APPUSER -c ". .rbenv.bash && cd $APPDIR && export RAILS_ENV=$APPENV && passenger start -a 127.0.0.1 -p $port -d --environment $APPENV --log-file /var/tmp/passenger-$NAME.log"
+        then
+            #wget -q -O /dev/null http://127.0.0.1:$port/ || true
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+    stop)
+        log_daemon_msg "Stopping $DESC" $NAME
+	if su -s /bin/bash - $APPUSER -c ". .rbenv.bash && export RAILS_ENV=$APPENV && cd $APPDIR && passenger stop -p $port"
+        then
+            if [ "`lsof -nPi:$port | grep -c LISTEN || true`" != "0" ]; then
+                sleep 5
+            fi
+            rm -f $PIDFILE
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+    reload|force-reload)
+        log_daemon_msg "Reloading $DESC configuration" $NAME
+	$0 stop
+	$0 start
+        ;;
+    reopen-logs)
+        log_daemon_msg "Reopening $DESC logs" $NAME
+	$0 stop
+	$0 start
+        ;;
+    restart)
+        log_daemon_msg "Restarting $DESC" $NAME
+        $0 stop
+        $0 start
+        ;;
+    status)
+	ps -p `cat $PIDFILE`
+        ;;
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload|status}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
