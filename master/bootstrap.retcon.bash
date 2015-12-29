@@ -36,6 +36,10 @@ if [ ! -d .rbenv ]; then
     echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
     echo 'eval "$(rbenv init -)"' >> ~/.profile
   fi
+  if [ ! -f ~/.rbenv.bash ]; then
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.rbenv.bash
+    echo 'eval "$(rbenv init -)"' >> ~/.rbenv.bash
+  fi
   . ~/.profile
   bash -l -c 'rbenv install `cat $HOME/retcon-web/.ruby-version`'
 fi
@@ -52,8 +56,14 @@ fi
 bash -l -c 'cd $HOME/retcon-web; bundle install'
 bash -l -c 'cd $HOME/retcon-web; bundle exec rake db:migrate'
 bash -l -c 'cd $HOME/retcon-web; script/runner /vagrant/seed_acceptance.rb'
-pkill --full passenger || true
-nohup bash -l -c 'cd $HOME/retcon-web; passenger start -p 3001' >passenger.install.log 2>&1 &
+#pkill --full passenger || true
+#nohup bash -l -c 'cd $HOME/retcon-web; passenger start -p 3001' >passenger.install.log 2>&1 &
+[ -e /etc/rc2.d/S*retcon-webapp ] || sudo update-rc.d retcon-webapp defaults
 bash -l -c 'cd $HOME/retcon-manager; bundle install'
-pkill --full retcon-manager || true
-nohup bash -l -c 'cd $HOME/retcon-manager; ./bin/retcon-manager' >retcon-manager-start.log 2>&1 &
+#pkill --full retcon-manager || true
+#nohup bash -l -c 'cd $HOME/retcon-manager; ./bin/retcon-manager' >retcon-manager-start.log 2>&1 &
+[ -e /etc/rc2.d/S*retcon-manager ] || sudo update-rc.d retcon-manager defaults
+sudo service retcon-webapp stop || true
+sudo service retcon-webapp start
+sudo service retcon-manager stop || true
+sudo service retcon-manager start
