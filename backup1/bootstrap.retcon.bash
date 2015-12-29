@@ -1,14 +1,20 @@
 set -e
 # exec >/var/tmp/bootstrap.retcon.`date +%F`-`date +%T`.log
 # exec 2>&1
+if [ "`hostname|grep -c '\.'`" = "0" -a -e /vagrant/Vagrantfile ]; then
+    sudo hostname `grep '^[[:space:]]*os.server_name' /vagrant/Vagrantfile |tr -d "'" |awk '{print $3; exit;}'`
+    sudo sh -c 'hostname > /etc/hostname'
+fi
 grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
-grep -q "retcon-acc" /etc/hosts || sudo sh -c "echo 172.17.1.116 retcon-acc >>/etc/hosts"
+grep -q "retcon-acc" /etc/hosts || sudo sh -c "echo 172.17.1.148 retcon-acc >>/etc/hosts"
 sudo rsync -rl /vagrant/files/./ /./
 #ip addr|grep -q eth0:1 || sudo ifup eth0:1
 sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
 if [ ! -f /etc/apt/sources.list.d/zfs-native-stable-trusty.list ]; then
   sudo add-apt-repository --yes ppa:zfs-native/stable
 fi
+[ -f /etc/cyso-overrides.conf ] || sudo touch /etc/cyso-overrides.conf
+grep -q 'gethash=no' /etc/cyso-overrides.conf || sudo sh -c "echo 'gethash=no' >>/etc/cyso-overrides.conf"
 wget http://plank.cyso.net/linux/apt.cyso.net.pub.key -q -O - | sudo apt-key add -
 apt_get_auto() {
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
@@ -16,7 +22,7 @@ apt_get_auto() {
 sudo apt-get update -qq && apt_get_auto dist-upgrade
 apt_get_auto install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
  zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
- cyso-firewall ubuntu-zfs
+ cyso-firewall cyso-key ubuntu-zfs
 sudo chmod 4755 /sbin/zfs /sbin/zpool
 sudo zpool status || shutdown -r now
 if [ ! -f /var/tmp/zfs-tank-disk0.img ]; then

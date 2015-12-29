@@ -1,4 +1,8 @@
 set -e
+if [ "`hostname|grep -c '\.'`" = "0" -a -e /vagrant/Vagrantfile ]; then
+    sudo hostname `grep '^[[:space:]]*os.server_name' /vagrant/Vagrantfile |tr -d "'" |awk '{print $3; exit;}'`
+    sudo sh -c 'hostname > /etc/hostname'
+fi
 grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
 sudo rsync -rl /vagrant/files/./ /./
 #ip addr|grep -q eth0:1 || sudo ifup eth0:1
@@ -7,16 +11,18 @@ wget http://plank.cyso.net/linux/apt.cyso.net.pub.key -q -O - | sudo apt-key add
 apt_get_auto() {
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
 }
+[ -f /etc/cyso-overrides.conf ] || sudo touch /etc/cyso-overrides.conf
+grep -q 'gethash=no' /etc/cyso-overrides.conf || sudo sh -c "echo 'gethash=no' >>/etc/cyso-overrides.conf"
 sudo apt-get update -qq && apt_get_auto dist-upgrade
 apt_get_auto install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
  zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
- nginx cyso-firewall
+ nginx cyso-firewall cyso-key
 [ -f $HOME/.gemrc ] || echo gem: --no-ri --no-rdoc >$HOME/.gemrc
 
 cd $HOME
 
 if [ ! -d retcon-web ]; then
-  git clone https://github.com/driehuis/retcon-web
+  git clone -b rails31 https://github.com/driehuis/retcon-web
 fi
 if [ ! -d retcon-manager ]; then
   git clone https://github.com/driehuis/retcon-manager
@@ -50,4 +56,4 @@ pkill --full passenger || true
 nohup bash -l -c 'cd $HOME/retcon-web; passenger start -p 3001' >passenger.install.log 2>&1 &
 bash -l -c 'cd $HOME/retcon-manager; bundle install'
 pkill --full retcon-manager || true
-nohup bash -l -c 'cd $HOME/retcon-manager; bin/retcon-manager' >retcon-manager-start.log 2>&1 &
+nohup bash -l -c 'cd $HOME/retcon-manager; ./bin/retcon-manager' >retcon-manager-start.log 2>&1 &

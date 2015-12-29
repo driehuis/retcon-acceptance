@@ -11,7 +11,7 @@ Vagrant.configure('2') do |config|
     os.password           = ENV['OS_PASSWORD']
     os.tenant_name        = ENV['OS_TENANT_NAME']
     os.flavor             = 'c1.small'
-    os.image              = 'Ubuntu 14.04.2 LTS - Trusty Tahr - 64-bit - Cyso Cloud Based Image'
+    os.image              = 'Ubuntu 14.04.3 LTS - Trusty Tahr - 64-bit - Cyso Cloud Based image'
     os.floating_ip_pool   = 'external'
     os.server_name        = 'backup1-acc'
     os.security_groups    = ['default']
