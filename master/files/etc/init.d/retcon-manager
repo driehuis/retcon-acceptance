@@ -14,15 +14,16 @@ APPUSER=ubuntu
 APPHOME=/home/ubuntu/retcon-manager
 N=/etc/init.d/retcon-manager
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+APPENV=production
 
 set -e
 
 case "$1" in
   start)
-        sudo -u $APPUSER sh -c ". \$HOME/.rbenv.bash; cd $APPHOME; DAEMON_ENV=development ./bin/retcon-manager start"
+        sudo -u $APPUSER sh -c ". \$HOME/.rbenv.bash; cd $APPHOME; DAEMON_ENV=$APPENV ./bin/retcon-manager start"
 	;;
   stop)
-        sudo -u $APPUSER sh -c ". \$HOME/.rbenv.bash; cd $APPHOME; DAEMON_ENV=development exec ./bin/retcon-manager stop"
+        sudo -u $APPUSER sh -c ". \$HOME/.rbenv.bash; cd $APPHOME; DAEMON_ENV=$APPENV exec ./bin/retcon-manager stop"
 	;;
   reload|restart|force-reload)
 	$0 stop
