@@ -23,10 +23,13 @@ cd $HOME
 
 if [ ! -d retcon-web ]; then
   git clone -b rails31 https://github.com/driehuis/retcon-web
+  (cd retcon-web && patch -p1 </vagrant/rails.version.diff)
 fi
 if [ ! -d retcon-manager ]; then
   git clone https://github.com/driehuis/retcon-manager
 fi
+# Force retcon-manager to use the same ruby version as retcon-web
+cmp -s retcon-web/.ruby-version retcon-manager/.ruby-version || cp retcon-web/.ruby-version retcon-manager/.ruby-version
 
 if [ ! -d .rbenv ]; then
   git clone https://github.com/sstephenson/rbenv.git ~/.rbenv

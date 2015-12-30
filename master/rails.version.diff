@@ -1,0 +1,13 @@
+diff --git a/app/views/layouts/application.html.erb b/app/views/layouts/application.html.erb
+index 126cdaa..f633cc7 100644
+--- a/app/views/layouts/application.html.erb
++++ b/app/views/layouts/application.html.erb
+@@ -23,7 +23,7 @@
+     <div id="global_links">
+       <%= render :partial => 'shared/global_links' %>
+     </div>
+-    <h1><%= link_to(raw('Retcon <span>blast from the past</span>'), root_path) %></h1>
++    <h1><%= link_to(raw("Retcon <span>blast from the past (Rails #{Rails::VERSION::STRING})</span>"), root_path) %></h1>
+ 
+     <nav>
+       <%= render :partial => 'shared/tabs' %>
