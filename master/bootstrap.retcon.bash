@@ -47,8 +47,8 @@ if [ ! -d .rbenv ]; then
   bash -l -c 'rbenv install `cat $HOME/retcon-web/.ruby-version`'
 fi
 
-bash -l -c 'cd $HOME/retcon-web; which bundle || gem install -v=1.7.6 bundler'
-bash -l -c 'cd $HOME/retcon-web; which passenger || gem install -v=4.0.59 passenger'
+bash -l -c 'cd $HOME/retcon-web; rbenv which bundle || gem install -v=1.7.6 bundler'
+bash -l -c 'cd $HOME/retcon-web; rbenv which passenger || gem install -v=4.0.59 passenger'
 if [ ! -e retcon-web/config/database.yml ]; then
   cp -i retcon-web/config/database.yml.sample retcon-web/config/database.yml
 fi
