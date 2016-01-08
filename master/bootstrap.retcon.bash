@@ -11,7 +11,7 @@ distro=trusty
 sources_list=/etc/apt/sources.list.d/${distro}-cyso-repo.list
 [ -e $sources_list ] || sudo touch $sources_list
 grep -q apt.cyso.net/cysonet $sources_list || sudo sh -c "echo 'deb [arch=amd64] http://apt.cyso.net/cysonet $distro main us2' >>$sources_list"
-wget http://plank.cyso.net/linux/apt.cyso.net.pub.key -q -O - | sudo apt-key add -
+wget -q -O - http://plank.cyso.net/linux/apt.cyso.net.pub.key | sudo apt-key add -
 apt_get_auto() {
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
 }
