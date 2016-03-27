@@ -14,7 +14,7 @@ APPUSER=ubuntu
 APPHOME=/home/ubuntu/retcon-manager
 N=/etc/init.d/retcon-manager
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-APPENV=production
+APPENV=development
 
 set -e
 
