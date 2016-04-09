@@ -1,0 +1,47 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          retcon-acc-zfs-prep
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
+
+set -e
+
+case "$1" in
+  start)
+      echo "Preparing a dummy ZFS pool for Retcon's acceptance environment"
+      if [ ! -f /var/tmp/zfs-tank-disk0.img ]; then
+          sudo dd if=/dev/zero of=/var/tmp/zfs-tank-disk0.img bs=4M count=2000
+      fi
+      if [ "`sudo losetup -a`" = "" ]; then
+          sudo losetup /dev/loop0 /var/tmp/zfs-tank-disk0.img
+      fi
+      if sudo zpool list | grep -q 'no pools'; then
+          sudo zpool import tank || sudo zpool create tank /dev/loop0
+      fi
+      # Make sure zfs and zpool can be executed by non-root users. Apparently, that
+      # was how it worked on Solaris. We need to do this on reboot to make sure
+      # the work we did in provisioning isn't undone by OS security updates.
+      if [ "`stat -c %A /sbin/zfs|grep -c ...s......`" = "0" ]; then
+          chmod 4555 /sbin/zfs
+      fi
+      if [ "`stat -c %A /sbin/zpool|grep -c ...s......`" = "0" ]; then
+          chmod 4555 /sbin/zpool
+      fi
+	;;
+  stop)
+	;;
+  reload|restart|force-reload)
+	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

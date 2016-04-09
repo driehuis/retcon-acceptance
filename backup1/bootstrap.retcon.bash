@@ -23,17 +23,6 @@ sudo apt-get update -qq && apt_get_auto dist-upgrade
 apt_get_auto install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
  zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
  cyso-firewall cyso-key ubuntu-zfs
-sudo chmod 4755 /sbin/zfs /sbin/zpool
-sudo zpool status || shutdown -r now
-if [ ! -f /var/tmp/zfs-tank-disk0.img ]; then
- sudo dd if=/dev/zero of=/var/tmp/zfs-tank-disk0.img bs=4M count=2000
-fi
-if [ "`sudo losetup -a`" = "" ]; then
-  sudo losetup /dev/loop0 /var/tmp/zfs-tank-disk0.img
-fi
-if sudo zpool list | grep -q 'no pools'; then
- sudo zpool import tank || sudo zpool create tank /dev/loop0
-fi
 
 [ -h /bin/pfexec ] || sudo ln -s /usr/bin/sudo /bin/pfexec
 [ -h /usr/bin/pfexec ] || sudo ln -s /usr/bin/sudo /usr/bin/pfexec
@@ -73,7 +62,16 @@ if [ ! -e commander/config/commander.yml ]; then
   cp -i /vagrant/commander.yml commander/config/commander.yml
 fi
 bash -l -c 'cd $HOME/commander; bundle install'
-pkill --full commander || true
-nohup bash -l -c 'cd $HOME/commander; bin/commander </dev/null' >commander.start.log 2>&1 &
+
+[ -e /etc/rc2.d/S21retcon-acc-zfs-prep ] || sudo update-rc.d retcon-acc-zfs-prep defaults 21 79
+[ -e /etc/rc2.d/S22commander ] || sudo update-rc.d commander defaults 22 78
+
+# If zpool status errors out, that means that ZFS has not been loaded by the kernel.
+# We reboot to fix that, rather than trying to get modprobe to play ball. Security
+# updates may mean that the kernel we're running now is not the most recent kernel
+# so wee need that reboot anyway.
+sudo zpool status || sudo shutdown -r now
+sudo invoke-rc.d retcon-acc-zfs-prep start
+sudo invoke-rc.d commander start
 echo All done
 exit 0

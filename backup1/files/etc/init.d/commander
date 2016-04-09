@@ -2,7 +2,7 @@
 
 ### BEGIN INIT INFO
 # Provides:          commander
-# Required-Start:    $local_fs $remote_fs
+# Required-Start:    $local_fs $remote_fs retcon-acc-zfs-prep
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
@@ -14,15 +14,17 @@ APPUSER=ubuntu
 APPHOME=/home/ubuntu/commander
 N=/etc/init.d/commander
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-APPENV=production
+APPENV=development
 
 set -e
 
 case "$1" in
   start)
+      echo "Starting commander"
         sudo -u $APPUSER sh -c ". \$HOME/.profile; cd $APPHOME; DAEMON_ENV=$APPENV ./bin/commander start"
 	;;
   stop)
+      echo "Stopping commander"
         sudo -u $APPUSER sh -c ". \$HOME/.profile; cd $APPHOME; DAEMON_ENV=$APPENV exec ./bin/commander stop"
 	;;
   reload|restart|force-reload)
