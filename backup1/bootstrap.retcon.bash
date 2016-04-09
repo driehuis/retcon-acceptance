@@ -7,6 +7,8 @@ if [ "`hostname|grep -c '\.'`" = "0" -a -e /vagrant/Vagrantfile ]; then
 fi
 grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
 grep -q "retcon-acc" /etc/hosts || sudo sh -c "echo 172.17.1.148 retcon-acc >>/etc/hosts"
+# Here's a poor man's recipy to see if the installed files match what's in git:
+#   diff --unidirectional-new-file -u -r / backup1/files|grep -v '^Only in /'
 sudo rsync -rl /vagrant/files/./ /./
 #ip addr|grep -q eth0:1 || sudo ifup eth0:1
 sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
