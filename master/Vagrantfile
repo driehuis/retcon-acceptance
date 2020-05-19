@@ -1,25 +1,14 @@
-require 'vagrant-openstack-provider'
-
 Vagrant.configure('2') do |config|
+  config.vm.box       = 'ubuntu/bionic64'
+  config.vm.network "public_network", bridge: "bridge0", ip: "192.168.1.201"
 
-  config.vm.box       = 'openstack'
-  config.ssh.username = 'stack'
-
-  config.vm.provider :openstack do |os|
-    os.openstack_auth_url = ENV['OS_AUTH_URL'] + '/tokens'
-    os.username           = ENV['OS_USERNAME']
-    os.password           = ENV['OS_PASSWORD']
-    os.tenant_name        = ENV['OS_TENANT_NAME']
-    os.flavor             = 'c1.tiny'
-    os.image              = 'Ubuntu 14.04.3 LTS - Trusty Tahr - 64-bit - Cyso Cloud Based image'
-    os.floating_ip_pool   = 'external'
-    os.server_name        = 'retcon-acc.bert.cyso.net'
-    os.security_groups    = ['default']
+  # Work around https://bugs.launchpad.net/cloud-images/+bug/1829625
+  config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+    v.customize ["modifyvm", :id, "--uartmode1", "file", File::NULL]
   end
-  
+
   config.vm.provision "shell",
     inline: "bash /vagrant/bootstrap.retcon.bash",
     privileged: false
-
-  config.ssh.username     = 'ubuntu'
 end

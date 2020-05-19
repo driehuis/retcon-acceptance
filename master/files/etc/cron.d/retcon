@@ -1,2 +1,1 @@
-MAILTO=bert@cyso.nl
-1-59/15 * * * *	ubuntu bash /opt/scripts/update-retcon-stats 2>&1 | logger -p daemon.info -t retcon-runner
+1-59/15 * * * *	retcon bash /opt/scripts/update-retcon-stats 2>&1 | logger -p daemon.info -t retcon-runner

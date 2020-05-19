@@ -10,8 +10,8 @@
 
 set -e
 
-APPUSER=ubuntu
-APPHOME=/home/ubuntu/commander
+APPUSER=retcon
+APPHOME=/home/retcon/commander
 N=/etc/init.d/commander
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 APPENV=development

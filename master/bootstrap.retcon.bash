@@ -1,32 +1,31 @@
 set -e
-if [ "`hostname|grep -c '\.'`" = "0" -a -e /vagrant/Vagrantfile ]; then
-    sudo hostname `grep '^[[:space:]]*os.server_name' /vagrant/Vagrantfile |tr -d "'" |awk '{print $3; exit;}'`
-    sudo sh -c 'hostname > /etc/hostname'
+if [ "`whoami`" != "retcon" ]; then
+	if [ "`hostname|grep -c '\.'`" = "0" -a -e /vagrant/Vagrantfile ]; then
+	    sudo hostname `grep '^[[:space:]]*os.server_name' /vagrant/Vagrantfile |tr -d "'" |awk '{print $3; exit;}'`
+	    sudo sh -c 'hostname > /etc/hostname'
+	fi
+	grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
+	sudo rsync -rl /vagrant/files/./ /./
+	distro=bionic
+	apt_get_auto() {
+	  sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
+	}
+	sudo apt-get update -qq && apt_get_auto dist-upgrade
+	apt_get_auto install autoconf bison build-essential libssl1.0-dev libyaml-dev libreadline6-dev\
+	 zlib1g-dev libncurses5-dev libffi-dev libgdbm5 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
+	 nginx
+	grep -q '^retcon:' /etc/passwd || sudo adduser --disabled-password --gecos retcon retcon
+	exec sudo su "retcon" "$0" -- "$@"
+	echo Could not switch to retcon user
+	exit 1
 fi
-grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
-sudo rsync -rl /vagrant/files/./ /./
-#ip addr|grep -q eth0:1 || sudo ifup eth0:1
-[ "`cat /etc/apt/sources.list|wc -l`" = "1" ] || sudo sh -c "echo '# Cleared by $0, using sources.list.d instead' >/etc/apt/sources.list"
-distro=trusty
-sources_list=/etc/apt/sources.list.d/${distro}-cyso-repo.list
-[ -e $sources_list ] || sudo touch $sources_list
-grep -q apt.cyso.net/cysonet $sources_list || sudo sh -c "echo 'deb [arch=amd64] http://apt.cyso.net/cysonet $distro main us2' >>$sources_list"
-wget -q -O - http://plank.cyso.net/linux/apt.cyso.net.pub.key | sudo apt-key add -
-apt_get_auto() {
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
-}
-[ -f /etc/cyso-overrides.conf ] || sudo touch /etc/cyso-overrides.conf
-grep -q 'gethash=no' /etc/cyso-overrides.conf || sudo sh -c "echo 'gethash=no' >>/etc/cyso-overrides.conf"
-sudo apt-get update -qq && apt_get_auto dist-upgrade
-apt_get_auto install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
- zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
- nginx cyso-firewall cyso-key
+
 [ -f $HOME/.gemrc ] || echo gem: --no-ri --no-rdoc >$HOME/.gemrc
 
 cd $HOME
 
 if [ ! -d retcon-web ]; then
-  git clone -b rails31 https://github.com/driehuis/retcon-web
+  git clone https://github.com/driehuis/retcon-web
   (cd retcon-web && patch -p1 </vagrant/rails.version.diff)
 fi
 if [ ! -d retcon-manager ]; then

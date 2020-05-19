@@ -1,12 +1,6 @@
 # Do I have to run?
 ENABLED="YES"
 
-# What networks do I have @ my interfaces
-LOCALNETS="85.158.200.68/255.255.255.224 127.0.0.1/255.0.0.0"
-
-# Who is my backup server?
-BACKUPSERVER="217.170.2.78"
-
 # What ports are allowed in for everyone?
 TCP_OPEN=""
 UDP_OPEN=""

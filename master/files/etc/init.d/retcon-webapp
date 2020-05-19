@@ -13,12 +13,12 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 NAME=retcon-webapp
 port=3001
-APPDIR=/home/ubuntu/retcon-web
+APPDIR=/home/retcon/retcon-web
 PIDFILE=$APPDIR/tmp/pids/passenger.$port.pid
 SCRIPTNAME=/etc/init.d/$NAME
 APPENV=development
 DESC="recton-web ($APPENV)"
-APPUSER=ubuntu
+APPUSER=retcon
 
 DAEMON_OPTS=""
 

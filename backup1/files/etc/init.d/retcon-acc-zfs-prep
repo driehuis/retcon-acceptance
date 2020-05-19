@@ -16,11 +16,16 @@ case "$1" in
       if [ ! -f /var/tmp/zfs-tank-disk0.img ]; then
           sudo dd if=/dev/zero of=/var/tmp/zfs-tank-disk0.img bs=4M count=2000
       fi
-      if [ "`sudo losetup -a`" = "" ]; then
-          sudo losetup /dev/loop0 /var/tmp/zfs-tank-disk0.img
+      if [ "`sudo losetup -a | grep /var/tmp/zfs-tank-disk0.img`" = "" ]; then
+          sudo losetup -f /var/tmp/zfs-tank-disk0.img
+      fi
+      loopdev=`losetup | grep /var/tmp/zfs-tank-disk0.img | awk '{print $1}'`
+      if [ -z "$loopdev" ]; then
+        echo "Could not set up loopback device"
+        exit 1
       fi
       if sudo zpool list | grep -q 'no pools'; then
-          sudo zpool import tank || sudo zpool create tank /dev/loop0
+          sudo zpool import tank || sudo zpool create tank $loopdev
       fi
       # Make sure zfs and zpool can be executed by non-root users. Apparently, that
       # was how it worked on Solaris. We need to do this on reboot to make sure
