@@ -22,7 +22,7 @@ p1=Profile.find_or_initialize_by_name("Linux")
 if p1.new_record?
   p1.save
   p1.exclusive=false
-  l=%w{/dev /proc /sys /backup /tmp /var/spool/mqueue* /var/lib/sendmail /var/lib/ntp/proc cdrom/ /var/lib/cyrus/proc/** /var/lib/php5/sess_* /var/lib/amavis/* /var/log/lastlog /var/tmp /tank}
+  l=%w{/dev /proc /sys /backup /tmp /var/spool/mqueue* /var/lib/sendmail /var/lib/ntp/proc cdrom/ /var/lib/cyrus/proc/** /var/lib/php5/sess_* /var/lib/amavis/* /var/lib/lxcfs/cgroup /var/log/lastlog /var/tmp /tank}
   l.each do |path|
     p1.excludes.create(:path => path)
   end
