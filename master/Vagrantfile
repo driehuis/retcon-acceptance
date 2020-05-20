@@ -1,6 +1,6 @@
 Vagrant.configure('2') do |config|
   config.vm.box       = 'ubuntu/bionic64'
-  config.vm.network "public_network", bridge: "bridge0", ip: "192.168.1.201"
+  config.vm.network "public_network", bridge: "eth0", ip: "192.168.1.201"
 
   # Work around https://bugs.launchpad.net/cloud-images/+bug/1829625
   config.vm.provider "virtualbox" do |v|

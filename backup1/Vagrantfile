@@ -1,7 +1,12 @@
+unless Vagrant.has_plugin?("vagrant-disksize")
+    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
 Vagrant.configure('2') do |config|
 
   config.vm.box       = 'ubuntu/bionic64'
-  config.vm.network "public_network", bridge: "bridge0", ip: "192.168.1.202"
+  config.vm.network "public_network", bridge: "eth0", ip: "192.168.1.202"
+  config.disksize.size = '20GB'
 
   # Work around https://bugs.launchpad.net/cloud-images/+bug/1829625
   config.vm.provider "virtualbox" do |v|
