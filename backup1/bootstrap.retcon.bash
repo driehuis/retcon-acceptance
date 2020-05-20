@@ -8,7 +8,7 @@ if [ "`whoami`" != "retcon" ]; then
     sudo sh -c 'hostname > /etc/hostname'
   fi
   grep -q "`hostname`$" /etc/hosts || sudo sh -c "echo 127.0.0.1 `hostname` >>/etc/hosts"
-  grep -q "retcon-acc" /etc/hosts || sudo sh -c "echo 172.17.1.148 retcon-acc >>/etc/hosts"
+  grep -q "retcon-acc" /etc/hosts || sudo sh -c "echo 192.168.1.201 retcon-acc >>/etc/hosts"
   # Here's a poor man's recipy to see if the installed files match what's in git:
   #   diff --unidirectional-new-file -u -r / backup1/files|grep -v '^Only in /'
   sudo rsync -rl /vagrant/files/./ /./
@@ -17,8 +17,8 @@ if [ "`whoami`" != "retcon" ]; then
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"
   }
   sudo apt-get update -qq && apt_get_auto dist-upgrade
-  apt_get_auto install autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev\
-  zlib1g-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
+  apt_get_auto install autoconf bison build-essential libssl1.0-dev libyaml-dev libreadline6-dev\
+  zlib1g-dev libncurses5-dev libffi-dev libgdbm5 libgdbm-dev git libsqlite3-dev subversion libpq-dev\
   zfsutils-linux
 
   [ -h /bin/pfexec ] || sudo ln -s /usr/bin/sudo /bin/pfexec
