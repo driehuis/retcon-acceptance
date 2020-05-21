@@ -5,6 +5,17 @@ to evaluate the Retcon backup manager.
 
 The resulting server is not intended to run in production.
 
+Feel free to tweak this setup to your liking. As distributed, it brings up one backup server
+(a server that has a ZFS pool and rsync/ssh access to the network or networks it is intended
+to back up), and a retcon master (where the user interface is run and the administration is kept).
+Change the Vagrantfiles if you don't like the design choices:
+
+* Uses the vagrant virtualbox driver, with disksize and vbguest plugins
+* Bridges both servers to your local network, using 192.168.1.201 and 192.168.1.202
+
+If you change IP addresses, you must also change them in the bootstrap scripts. There is no
+templating for now.
+
 Caveats
 -------
 
