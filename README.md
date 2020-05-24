@@ -16,6 +16,10 @@ Change the Vagrantfiles if you don't like the design choices:
 If you change IP addresses, you must also change them in the bootstrap scripts. There is no
 templating for now.
 
+The zpool is created in a loopback device backed by storage in /var/tmp of the backup server.
+This obviously does not scale well for production, but no two ZFS users are alike so this
+forces you to think about your own ZFS deployment in production.
+
 Caveats
 -------
 
