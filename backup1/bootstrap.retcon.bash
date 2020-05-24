@@ -39,8 +39,9 @@ if [ "`whoami`" != "retcon" ]; then
     cat tmpssh/id_rsa.pub | sed -e 's/^/from="127.0.0.1" /' >tmpssh/authorized_keys
     sudo mkdir -p /root/.ssh
     sudo su - retcon sh -c 'mkdir -p ~/.ssh'
-    sudo install -m 0400 tmpssh/id_rsa -o retcon -g retcon ~retcon/.ssh/id_rsa
-    sudo install -m 0400 tmpssh/id_rsa.pub -o retcon -g retcon ~retcon/.ssh/id_rsa.pub
+    sudo install -m 0400 -o root   -g root   tmpssh/id_rsa     /root/.ssh/id_rsa
+    sudo install -m 0400 -o retcon -g retcon tmpssh/id_rsa     ~retcon/.ssh/id_rsa
+    sudo install -m 0400 -o retcon -g retcon tmpssh/id_rsa.pub ~retcon/.ssh/id_rsa.pub
     sudo sh -c 'cat ~retcon/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys'
   fi
 
