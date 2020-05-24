@@ -1,2 +1,2 @@
 Defaults:retcon !requiretty
-retcon ALL = (root) NOPASSWD: /usr/sbin/service,/usr/sbin/update-rc.d,/bin/cp,/sbin/zpool,/usr/sbin/invoke-rc.d,/bin/sh,/sbin/zfs,/usr/bin/rsync
+retcon ALL = (root) NOPASSWD: /sbin/zpool,/sbin/zfs,/usr/bin/rsync

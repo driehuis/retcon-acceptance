@@ -26,23 +26,46 @@ if [ "`whoami`" != "retcon" ]; then
   [ -d /usr/gnu/bin ] || sudo mkdir -p /usr/gnu/bin
   [ -h /usr/gnu/bin/sed ] || sudo ln -s `which sed` /usr/gnu/bin/sed
   [ -h /usr/gnu/bin/awk ] || sudo ln -s `which awk` /usr/gnu/bin/awk
+
+  [ -e /etc/rc2.d/S21retcon-acc-zfs-prep ] || sudo update-rc.d retcon-acc-zfs-prep defaults 21 79
+  [ -e /etc/rc2.d/S22commander ] || sudo update-rc.d commander defaults 22 78
+
   grep -q '^retcon:' /etc/passwd || sudo adduser --disabled-password --gecos retcon retcon
-	exec sudo su "retcon" "$0" -- "$@"
-  echo Could not switch to retcon user
-  exit 1
+
+  if [ ! -f ~retcon/.ssh/id_rsa ]; then
+    rm -rf tmpssh
+    mkdir tmpssh
+    ssh-keygen -N "" -f tmpssh/id_rsa
+    cat tmpssh/id_rsa.pub | sed -e 's/^/from="127.0.0.1" /' >tmpssh/authorized_keys
+    sudo mkdir -p /root/.ssh
+    sudo su - retcon sh -c 'mkdir -p ~/.ssh'
+    sudo install -m 0400 tmpssh/id_rsa -o retcon -g retcon ~retcon/.ssh/id_rsa
+    sudo install -m 0400 tmpssh/id_rsa.pub -o retcon -g retcon ~retcon/.ssh/id_rsa.pub
+    sudo sh -c 'cat ~retcon/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys'
+  fi
+
+  sudo su retcon "$0" -- "$@"
+
+  # If zpool status errors out, that means that ZFS has not been loaded by the kernel.
+  # We reboot to fix that, rather than trying to get modprobe to play ball. Security
+  # updates may mean that the kernel we're running now is not the most recent kernel
+  # so we need that reboot anyway. If we're not rebooting, try to prep zfs and start
+  # commander.
+  sudo zpool status || sudo shutdown -r now
+  sudo invoke-rc.d retcon-acc-zfs-prep start
+  sudo invoke-rc.d commander start
+  echo All done
+  exit 0
 fi
 
 [ -f $HOME/.gemrc ] || echo gem: --no-ri --no-rdoc >$HOME/.gemrc
 
-cd $HOME
+[ -f $HOME/.ssh/config ] || cat > $HOME/.ssh/config <<"EOD"
+Host *
+	User root
+EOD
 
-if [ ! -f .ssh/id_rsa ]; then
-  mkdir -p .ssh
-  ssh-keygen -N '' -f .ssh/id_rsa
-  cat .ssh/id_rsa.pub | sed -e 's/^/from="127.0.0.1" /' >>.ssh/authorized_keys
-  sudo cp $HOME/.ssh/id_rsa /root/.ssh
-  cat .ssh/id_rsa.pub | sed -e 's/^/from="127.0.0.1" /' | sudo sh -c 'cat >>/root/.ssh/authorized_keys'
-fi
+cd $HOME
 
 if [ ! -d commander ]; then
   git clone https://github.com/driehuis/commander
@@ -66,15 +89,4 @@ if [ ! -e commander/config/commander.yml ]; then
 fi
 bash -l -c 'cd $HOME/commander; bundle install'
 
-[ -e /etc/rc2.d/S21retcon-acc-zfs-prep ] || sudo update-rc.d retcon-acc-zfs-prep defaults 21 79
-[ -e /etc/rc2.d/S22commander ] || sudo update-rc.d commander defaults 22 78
-
-# If zpool status errors out, that means that ZFS has not been loaded by the kernel.
-# We reboot to fix that, rather than trying to get modprobe to play ball. Security
-# updates may mean that the kernel we're running now is not the most recent kernel
-# so wee need that reboot anyway.
-sudo zpool status || sudo shutdown -r now
-sudo invoke-rc.d retcon-acc-zfs-prep start
-sudo invoke-rc.d commander start
-echo All done
 exit 0
