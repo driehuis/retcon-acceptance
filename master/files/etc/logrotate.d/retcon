@@ -1,0 +1,14 @@
+/home/retcon/retcon-web/log/development.log {
+        weekly
+        rotate 12
+        compress
+        delaycompress
+        missingok
+        notifempty
+        create 644 retcon retcon
+	sharedscripts
+	postrotate
+		systemctl restart retcon-webapp.service 2>&1 | logger -t logrotate-retcon-webapp -p daemon.notice
+	endscript
+
+}
